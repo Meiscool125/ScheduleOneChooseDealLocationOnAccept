@@ -3,3 +3,4 @@
 <p>Same installation process as any other mod.<p/>
 <p>Source code + DLL in bin/debug/ChooseDealLocationOnAccept.dll<p/>
 <p>THANK YOU TO JUMBLEBUMBLE FOR ADDING IL2CPP SUPPORT! didnt check it before merging so probably check it yourself before downloading. HAVENT BUILT DLL FOR IL2CPP EITHER. will do tmrw maybe<p/>
+<p>I BUILT THE WRONG VERSION FOR IL2CPP! BOTH FILES FROM THUNDERSTORE ARE FOR MONO WILL FIX SOON<p/>
