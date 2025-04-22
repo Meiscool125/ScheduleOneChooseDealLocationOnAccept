@@ -1,10 +1,8 @@
-﻿using MelonLoader;
-using HarmonyLib;
+﻿using HarmonyLib;
+using Il2CppScheduleOne.Economy;
+using Il2CppScheduleOne.Quests;
+using MelonLoader;
 using UnityEngine;
-using ScheduleOne.Economy;
-using ScheduleOne.Quests;
-using System;
-using System.Collections.Generic;
 
 public class ChooseDealLocationOnAccept : MelonMod
 {
@@ -17,15 +15,15 @@ public class ChooseDealLocationOnAccept : MelonMod
     private static Rect windowUIRect = new Rect(100, 100, 350, 250); // Start position/size
     private static string currentUIMode = "Random";
     private Vector2 scrollUIPosition = Vector2.zero;
-    
+
 
     //helper methods
-    public static void Print(String s)
+    public static void Print(System.String s)
     {
         MelonLogger.Msg(s);
     }
 
-    public static String GetGuidFromDict(String locationName)
+    public static System.String GetGuidFromDict(System.String locationName)
     {
 
         if (LocationGuids.TryGetValue(locationName, out string locationGuid))
@@ -50,23 +48,23 @@ public class ChooseDealLocationOnAccept : MelonMod
     public override void OnLateInitializeMelon()
     {
         // OnLateInitializeMelon waits for unity to be loaded, sending this line before unity loads will throw an exception
-        ScheduleOne.Persistence.LoadManager.Instance.onLoadComplete.AddListener(ChooseDealLocationOnAccept.MakeDeliveryLocationsDict);
+        Il2CppScheduleOne.Persistence.LoadManager.Instance.onLoadComplete.AddListener((UnityEngine.Events.UnityAction)MakeDeliveryLocationsDict);
     }
     public override void OnUpdate()
     {
         if (Input.GetKeyDown(KeyCode.F5))
         {
-            showUI = !showUI;           
+            showUI = !showUI;
         }
     }
 
     //UI
     private void DrawWindow(int windowID)
     {
-        
+
         if (GUILayout.Button(("Current mode: " + currentUIMode)))
         {
-            if(currentUIMode == "Choose")
+            if (currentUIMode == "Choose")
             {
                 currentUIMode = "Random";
             }
@@ -79,7 +77,7 @@ public class ChooseDealLocationOnAccept : MelonMod
         if (currentUIMode == "Choose")
         {
             GUILayout.Label($"Current selected location: {currentSelectedDeliveryLocation}");
-            scrollUIPosition = GUILayout.BeginScrollView(scrollUIPosition, GUILayout.Height(windowUIRect.height-20));
+            scrollUIPosition = GUILayout.BeginScrollView(scrollUIPosition, GUILayout.Height(windowUIRect.height - 20));
             foreach (KeyValuePair<string, string> pair in LocationGuids)
             {
                 if (GUILayout.Button(pair.Key))
@@ -98,7 +96,7 @@ public class ChooseDealLocationOnAccept : MelonMod
     {
         if (showUI)
         {
-            windowUIRect = GUI.Window(0, windowUIRect, DrawWindow, "Choose Deal Locations");
+            windowUIRect = GUI.Window(0, windowUIRect, (GUI.WindowFunction)DrawWindow, "Choose Deal Locations");
         }
     }
 
@@ -127,14 +125,17 @@ public class ChooseDealLocationOnAccept : MelonMod
             deliveryLocations = GameObject.Find("Delivery Locations");
             Print("Got deliveryLocations");
         }
-        catch (Exception exception)
+        catch (System.Exception exception)
         {
             Print("Could not get deliveryLocations: " + exception);
             return;
         }
 
-        foreach (Transform child in deliveryLocations.transform)
+        Transform parentTransform = deliveryLocations.transform;
+
+        for (int i = 0; i < parentTransform.childCount; i++)
         {
+            Transform child = parentTransform.GetChild(i);
             DeliveryLocation location = child.GetComponent<DeliveryLocation>();
             if (location != null)
             {
