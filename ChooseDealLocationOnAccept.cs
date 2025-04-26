@@ -33,28 +33,21 @@ public class ChooseDealLocationOnAccept : MelonMod
     private static Customer pendingCustomer = null;
     //UI
     private static bool showUI = false;
-    private static Rect windowUIRect = new Rect(837, 354, 245, 335);
-    private Vector2 scrollUIPosition = Vector2.zero;
+    private static Rect windowUIRect;
+    private Vector2 scrollUIPosition;
     private GUIStyle squareWindowStyle;
     private GUIStyle squareButtonStyle;
     private GUIStyle squareLabelStyle; // don't delete this one! error without
-    private GUIStyle squareScrollStyle;
-    private GUIStyle squareScrollThumbStyle;
-    Texture2D buttonColorTex;
-    Texture2D buttonHoverColorTex;
+    private GUIStyle squareVerticalScrollStyle;
+    private GUIStyle squareVerticalScrollThumbStyle;
+    private GUIStyle squareHorizontalScrollStyle;
+    private GUIStyle squareHorizontalScrollThumbStyle;
+    private Texture2D blackTex;
+    private Texture2D buttonColorTex;
+    private Texture2D buttonHoverColorTex;
     private static Dictionary<string, GUIContent> buttonLabels = new Dictionary<string, GUIContent>();
 
     public static void Print(String s) => MelonLogger.Msg(s);
-
-    public static String GetGuidFromDict(String locationName)
-    {
-        if (LocationGuids.TryGetValue(locationName, out string locationGuid))
-        {
-            return locationGuid;
-        }
-        Print("No GUID found for location: " + locationName + ". Using Next to Bud's bar GUID instead.");
-        return "7549f5e4-3702-4890-aabf-a9a170cdf15b";
-    }
 
     public override void OnInitializeMelon()
     {
@@ -75,6 +68,11 @@ public class ChooseDealLocationOnAccept : MelonMod
         buttonHoverColorTex.SetPixel(0, 0, new Color(117f / 255f, 194f / 255f, 230f / 255f));
         buttonHoverColorTex.wrapMode = TextureWrapMode.Repeat;
         buttonHoverColorTex.Apply();
+
+        blackTex = new Texture2D(1, 1);
+        blackTex.SetPixel(0, 0, new Color(190f/255f, 190f / 255f, 190f / 255f));
+        blackTex.wrapMode = TextureWrapMode.Repeat;
+        blackTex.Apply();
     }
 
     [HarmonyPatch(typeof(Customer), "PlayerAcceptedContract")]
@@ -167,7 +165,7 @@ public class ChooseDealLocationOnAccept : MelonMod
 
         if (showUI)
         {
-            windowUIRect = GUI.Window(0, windowUIRect, (GUI.WindowFunction)DrawWindow, "Choose Deal Locations", squareWindowStyle);
+            windowUIRect = GUI.Window(0, windowUIRect, (GUI.WindowFunction)DrawWindow, "Choose where to meet the customer:", squareWindowStyle);
         }
 
         if (pendingCustomer != null && selectedDeliveryLocation)
@@ -178,42 +176,92 @@ public class ChooseDealLocationOnAccept : MelonMod
 
     private void InitializeStyles()
     {
+        // a big mess. probably need to make some helper methods for this stuff soon
         Texture2D whiteTex = Texture2D.whiteTexture;
-        Texture2D blackTex = Texture2D.blackTexture;
-        squareWindowStyle = new GUIStyle(GUI.skin.window)
-        {
-            normal = { background = whiteTex, textColor = Color.black },
-            padding = new RectOffset(10, 10, 20, 10)
-        };
+        scrollUIPosition = Vector2.zero;
+        windowUIRect = new Rect(837, 354, 245, 335);
 
-        squareButtonStyle = new GUIStyle(GUI.skin.button)
-        {
-            normal = { background = buttonColorTex, textColor = Color.white },
-            hover = { background = buttonHoverColorTex, textColor = Color.white },
-            border = new RectOffset(0, 0, 0, 0),
-        };
+        /*  steps:
+            1. make the GUIStyle
+            2. make the GUIStyleState
+            3. modify the GUIStyleState
+            4. apply the GUIStyleState to the GUIStyle
+        */
 
-        squareLabelStyle = new GUIStyle(GUI.skin.label)
-        {
-            normal = { textColor = Color.black },
-            wordWrap = true
-        };
+        //background everything rests on
+        squareWindowStyle = new GUIStyle(GUI.skin.window);
 
-        squareScrollStyle = new GUIStyle(GUI.skin.verticalScrollbar)
-        {
-            normal = { background = whiteTex },
-            border = new RectOffset(0, 0, 0, 0),
-            fixedWidth = 10
-        };
+        GUIStyleState normalSqaureWindowStyleState = new GUIStyleState();
+        normalSqaureWindowStyleState.background = whiteTex;
+        normalSqaureWindowStyleState.textColor = Color.black;
 
-        squareScrollThumbStyle = new GUIStyle(GUI.skin.verticalScrollbarThumb)
-        {
-            normal = { background = whiteTex },
-            border = new RectOffset(0, 0, 0, 0)
-        };
+        GUIStyleState onNormalSqaureWindowStyleState = new GUIStyleState();
+        onNormalSqaureWindowStyleState.background = whiteTex;
+        onNormalSqaureWindowStyleState.textColor = Color.black;
 
-        GUI.skin.verticalScrollbar = squareScrollStyle;
-        GUI.skin.verticalScrollbarThumb = squareScrollThumbStyle;
+        squareWindowStyle.padding = new RectOffset(10, 10, 20, 10);
+        squareWindowStyle.normal = normalSqaureWindowStyleState;
+        squareWindowStyle.onNormal = onNormalSqaureWindowStyleState;
+
+        // buttons
+
+        squareButtonStyle = new GUIStyle(GUI.skin.button);
+
+        GUIStyleState squareButtonNormalState = new GUIStyleState();
+        squareButtonNormalState.background = buttonColorTex;
+        squareButtonNormalState.textColor = Color.white;
+
+        GUIStyleState squareButtonHoverState = new GUIStyleState();
+        squareButtonHoverState.background = buttonHoverColorTex;
+        squareButtonHoverState.textColor = Color.white;
+
+        GUIStyleState squareButtonActiveState = new GUIStyleState();
+        squareButtonActiveState.background = buttonHoverColorTex;
+        squareButtonActiveState.textColor = Color.white;
+
+        squareButtonStyle.normal = squareButtonNormalState;
+        squareButtonStyle.hover = squareButtonHoverState;
+        squareButtonStyle.active = squareButtonActiveState;
+        squareButtonStyle.border = new RectOffset(0, 0, 0, 0);
+
+        // regular text
+
+        squareLabelStyle = new GUIStyle(GUI.skin.label);
+
+        GUIStyleState squareLabelNormalState = new GUIStyleState();
+        squareLabelNormalState.textColor = Color.black;
+
+        squareLabelStyle.normal = squareLabelNormalState;
+        squareLabelStyle.wordWrap = true;
+
+        // vertical scrollbar 
+        
+        squareVerticalScrollThumbStyle = new GUIStyle(GUI.skin.verticalScrollbarThumb);
+
+        GUIStyleState squareScrollThumbNormalState = new GUIStyleState();
+        squareScrollThumbNormalState.background = blackTex;
+
+        squareVerticalScrollThumbStyle.normal = squareScrollThumbNormalState;
+        squareVerticalScrollThumbStyle.border = new RectOffset(0, 0, 0, 0);
+
+        // horizontal scrollbar
+
+        squareHorizontalScrollThumbStyle = new GUIStyle(GUI.skin.horizontalScrollbarThumb);
+
+        GUIStyleState squareHorizontalScrollThumbNormalState = new GUIStyleState();
+        squareHorizontalScrollThumbNormalState.background = blackTex;
+
+        squareHorizontalScrollThumbStyle.normal = squareHorizontalScrollThumbNormalState;
+        squareHorizontalScrollThumbStyle.border = new RectOffset(0, 0, 0, 0);
+        
+        // Apply to GUI.skin
+
+        GUI.skin.horizontalScrollbar = squareHorizontalScrollStyle;
+        GUI.skin.horizontalScrollbarThumb = squareHorizontalScrollThumbStyle;
+        GUI.skin.verticalScrollbar = squareVerticalScrollStyle;
+        GUI.skin.verticalScrollbarThumb = squareVerticalScrollThumbStyle;
+
+        
     }
 
     public static void MakeDeliveryLocationsDict()

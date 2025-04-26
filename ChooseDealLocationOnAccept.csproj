@@ -52,23 +52,16 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="0Harmony">
-      <HintPath>libs\il2\0Harmony.dll</HintPath>
+    <Reference Include="0Harmony, Version=2.3.6.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Lib.Harmony.2.3.6\lib\net472\0Harmony.dll</HintPath>
     </Reference>
     <Reference Include="Assembly-CSharp, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>libs\il2\Assembly-CSharp.dll</HintPath>
+      <HintPath>libs\mono\Assembly-CSharp.dll</HintPath>
     </Reference>
-    <Reference Include="Il2CppFishNet.Runtime">
-      <HintPath>libs\il2\Il2CppFishNet.Runtime.dll</HintPath>
-    </Reference>
-    <Reference Include="Il2CppInterop.Runtime, Version=1.4.6.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="FishNet.Runtime, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>libs\il2\Il2CppInterop.Runtime.dll</HintPath>
-    </Reference>
-    <Reference Include="Il2Cppmscorlib, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>libs\il2\Il2Cppmscorlib.dll</HintPath>
+      <HintPath>libs\mono\FishNet.Runtime.dll</HintPath>
     </Reference>
     <Reference Include="MelonLoader">
       <HintPath>libs\il2\MelonLoader.dll</HintPath>
@@ -106,14 +99,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="libs\il2\Assembly-CSharp.dll" />
-    <Content Include="libs\il2\FishNet.Runtime.dll" />
-    <Content Include="libs\il2\Il2CppInterop.Runtime.dll" />
-    <Content Include="libs\il2\Il2Cppmscorlib.dll" />
-    <Content Include="libs\il2\UnityEngine.CoreModule.dll" />
-    <Content Include="libs\il2\UnityEngine.dll" />
-    <Content Include="libs\il2\UnityEngine.IMGUIModule.dll" />
-    <Content Include="libs\il2\UnityEngine.InputLegacyModule.dll" />
+    <Analyzer Include="libs\mono\Assembly-CSharp.dll" />
+  </ItemGroup>
+  <ItemGroup>
     <Content Include="libs\mono\Assembly-CSharp.dll" />
     <Content Include="libs\mono\FishNet.Runtime.dll" />
     <Content Include="libs\mono\UnityEngine.CoreModule.dll" />
