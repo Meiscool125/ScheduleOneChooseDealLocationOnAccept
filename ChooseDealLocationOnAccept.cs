@@ -1,8 +1,8 @@
-﻿using MelonLoader;
-using HarmonyLib;
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections.Generic;
 using System;
+using MelonLoader;
+using HarmonyLib;
 
 
 #if MELONLOADER_IL2CPP
@@ -51,7 +51,7 @@ public class ChooseDealLocationOnAccept : MelonMod
         if (LocationGuids.TryGetValue(locationName, out string locationGuid))
         {
             return locationGuid;
-        }  
+        }
         Print("No GUID found for location: " + locationName + ". Using Next to Bud's bar GUID instead.");
         return "7549f5e4-3702-4890-aabf-a9a170cdf15b";
     }
@@ -64,7 +64,7 @@ public class ChooseDealLocationOnAccept : MelonMod
     public override void OnLateInitializeMelon()
     {
         // wait till the game loads, then make the LocationGuids dict
-        ScheduleOne.Persistence.LoadManager.Instance.onLoadComplete.AddListener((UnityEngine.Events.UnityAction)MakeDeliveryLocationsDict);
+        ScheduleOneGame.Persistence.LoadManager.Instance.onLoadComplete.AddListener((UnityEngine.Events.UnityAction)MakeDeliveryLocationsDict);
         // make textures/colors
         buttonColorTex = new Texture2D(1, 1);
         buttonColorTex.SetPixel(0, 0, new Color(74f / 255f, 175f / 255f, 224f / 255f));
@@ -98,7 +98,7 @@ public class ChooseDealLocationOnAccept : MelonMod
     {
         public static bool Prefix(Customer __instance)
         {
-            
+
             if (__instance.OfferedContractInfo == null)
             {
                 MelonLogger.Warning("Offered contract is null!");
@@ -106,7 +106,7 @@ public class ChooseDealLocationOnAccept : MelonMod
             }
 
             // turns on some shading GameObjects to make it look better. original method code handled in the OnGUI() method
-            Transform dealWindowSelector = ScheduleOne.PlayerScripts.Player.Local.transform.Find("CameraContainer/Camera/OverlayCamera/GameplayMenu/Phone/phone/AppsCanvas/Messages/Container/DealWindowSelector");
+            Transform dealWindowSelector = GameObject.Find("Messages")?.transform.Find("Container")?.transform.Find("DealWindowSelector")?.transform;
             if (dealWindowSelector != null)
             {
                 dealWindowSelector.gameObject.SetActive(true);
@@ -177,7 +177,7 @@ public class ChooseDealLocationOnAccept : MelonMod
     }
 
     private void InitializeStyles()
-    {   
+    {
         Texture2D whiteTex = Texture2D.whiteTexture;
         Texture2D blackTex = Texture2D.blackTexture;
         squareWindowStyle = new GUIStyle(GUI.skin.window)
@@ -256,8 +256,9 @@ public class ChooseDealLocationOnAccept : MelonMod
         if (pendingCustomer != null && selectedDeliveryLocation)
         {
             // Reactivate Shade/Content
-            Transform shadeTransform = ScheduleOne.PlayerScripts.Player.Local.transform.Find("CameraContainer/Camera/OverlayCamera/GameplayMenu/Phone/phone/AppsCanvas/Messages/Container/DealWindowSelector/Shade");
-            Transform contentTransform = ScheduleOne.PlayerScripts.Player.Local.transform.Find("CameraContainer/Camera/OverlayCamera/GameplayMenu/Phone/phone/AppsCanvas/Messages/Container/DealWindowSelector/Shade/Content");
+            Transform dealWindowSelector = GameObject.Find("Messages")?.transform.Find("Container")?.transform.Find("DealWindowSelector")?.transform;
+            Transform shadeTransform = dealWindowSelector?.transform.Find("Shade")?.transform;
+            Transform contentTransform = shadeTransform?.Find("Content")?.transform;
             if (shadeTransform != null && contentTransform != null)
             {
                 shadeTransform.gameObject.SetActive(true);  // Reactivate Shade
