@@ -1,14 +1,18 @@
 ﻿using MelonLoader;
 using HarmonyLib;
 using UnityEngine;
+using System.Collections.Generic;
+using System;
+
+
 #if MELONLOADER_IL2CPP
-using ScheduleOne = Il2CppScheduleOne;
+using ScheduleOneGame = Il2CppScheduleOne;
 using Il2CppScheduleOne.DevUtilities;
 using Il2CppScheduleOne.Economy;
 using Il2CppScheduleOne.Quests;
 using Il2CppScheduleOne.UI.Phone.Messages;
 #else
-using ScheduleOne = ScheduleOne;
+using ScheduleOneGame = ScheduleOne;
 using ScheduleOne.Economy;
 using ScheduleOne.Quests;
 using ScheduleOne.UI.Phone.Messages;
@@ -36,6 +40,8 @@ public class ChooseDealLocationOnAccept : MelonMod
     private GUIStyle squareLabelStyle; // don't delete this one! error without
     private GUIStyle squareScrollStyle;
     private GUIStyle squareScrollThumbStyle;
+    Texture2D buttonColorTex;
+    Texture2D buttonHoverColorTex;
     private static Dictionary<string, GUIContent> buttonLabels = new Dictionary<string, GUIContent>();
 
     public static void Print(String s) => MelonLogger.Msg(s);
@@ -43,7 +49,9 @@ public class ChooseDealLocationOnAccept : MelonMod
     public static String GetGuidFromDict(String locationName)
     {
         if (LocationGuids.TryGetValue(locationName, out string locationGuid))
+        {
             return locationGuid;
+        }  
         Print("No GUID found for location: " + locationName + ". Using Next to Bud's bar GUID instead.");
         return "7549f5e4-3702-4890-aabf-a9a170cdf15b";
     }
@@ -57,6 +65,16 @@ public class ChooseDealLocationOnAccept : MelonMod
     {
         // wait till the game loads, then make the LocationGuids dict
         ScheduleOne.Persistence.LoadManager.Instance.onLoadComplete.AddListener((UnityEngine.Events.UnityAction)MakeDeliveryLocationsDict);
+        // make textures/colors
+        buttonColorTex = new Texture2D(1, 1);
+        buttonColorTex.SetPixel(0, 0, new Color(74f / 255f, 175f / 255f, 224f / 255f));
+        buttonColorTex.wrapMode = TextureWrapMode.Repeat;
+        buttonColorTex.Apply();
+
+        buttonHoverColorTex = new Texture2D(1, 1);
+        buttonHoverColorTex.SetPixel(0, 0, new Color(117f / 255f, 194f / 255f, 230f / 255f));
+        buttonHoverColorTex.wrapMode = TextureWrapMode.Repeat;
+        buttonHoverColorTex.Apply();
     }
 
     [HarmonyPatch(typeof(Customer), "PlayerAcceptedContract")]
@@ -80,13 +98,14 @@ public class ChooseDealLocationOnAccept : MelonMod
     {
         public static bool Prefix(Customer __instance)
         {
-            // turns on some shading GameObjects to make it look better. original method code handled in the OnGUI() method
+            
             if (__instance.OfferedContractInfo == null)
             {
                 MelonLogger.Warning("Offered contract is null!");
                 return false;
             }
 
+            // turns on some shading GameObjects to make it look better. original method code handled in the OnGUI() method
             Transform dealWindowSelector = ScheduleOne.PlayerScripts.Player.Local.transform.Find("CameraContainer/Camera/OverlayCamera/GameplayMenu/Phone/phone/AppsCanvas/Messages/Container/DealWindowSelector");
             if (dealWindowSelector != null)
             {
@@ -99,6 +118,7 @@ public class ChooseDealLocationOnAccept : MelonMod
                 if (background != null) background.gameObject.SetActive(true);
                 if (shade != null) shade.gameObject.SetActive(true);
                 if (content != null) content.gameObject.SetActive(false);
+                Print("Should've disabled!");
             }
             else
             {
@@ -157,20 +177,19 @@ public class ChooseDealLocationOnAccept : MelonMod
     }
 
     private void InitializeStyles()
-    {
+    {   
         Texture2D whiteTex = Texture2D.whiteTexture;
         Texture2D blackTex = Texture2D.blackTexture;
-        Texture2D buttonColorTex = whiteTex;
-
         squareWindowStyle = new GUIStyle(GUI.skin.window)
         {
-            normal = { background = buttonColorTex, textColor = Color.black },
+            normal = { background = whiteTex, textColor = Color.black },
             padding = new RectOffset(10, 10, 20, 10)
         };
 
         squareButtonStyle = new GUIStyle(GUI.skin.button)
         {
-            normal = { background = buttonColorTex, textColor = Color.black },
+            normal = { background = buttonColorTex, textColor = Color.white },
+            hover = { background = buttonHoverColorTex, textColor = Color.white },
             border = new RectOffset(0, 0, 0, 0),
         };
 
@@ -182,14 +201,14 @@ public class ChooseDealLocationOnAccept : MelonMod
 
         squareScrollStyle = new GUIStyle(GUI.skin.verticalScrollbar)
         {
-            normal = { background = buttonColorTex },
+            normal = { background = whiteTex },
             border = new RectOffset(0, 0, 0, 0),
             fixedWidth = 10
         };
 
         squareScrollThumbStyle = new GUIStyle(GUI.skin.verticalScrollbarThumb)
         {
-            normal = { background = buttonColorTex },
+            normal = { background = whiteTex },
             border = new RectOffset(0, 0, 0, 0)
         };
 
