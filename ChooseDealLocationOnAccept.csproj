@@ -1,18 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
-  <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{2CE5A4B9-304B-4BC7-8922-21427BD6C86C}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ChooseDealLocationOnAccept</RootNamespace>
-    <AssemblyName>ChooseDealLocationOnAccept</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <Deterministic>true</Deterministic>
-  </PropertyGroup>
+    <PropertyGroup>
+	    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+	    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+	    <ProjectGuid>{2CE5A4B9-304B-4BC7-8922-21427BD6C86C}</ProjectGuid>
+	    <OutputType>Library</OutputType>
+	    <AppDesignerFolder>Properties</AppDesignerFolder>
+	    <RootNamespace>ChooseDealLocationOnAccept</RootNamespace>
+	    <AssemblyName>ChooseDealLocationOnAccept</AssemblyName>
+	    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+	    <FileAlignment>512</FileAlignment>
+	    <Deterministic>true</Deterministic>
+	    <Configurations>Debug_IL2CPP;Release_IL2CPP;Debug_Mono;Release_Mono</Configurations>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)' == 'Debug_IL2CPP'">
+	    <DefineConstants>MELONLOADER_IL2CPP</DefineConstants>
+	    <AssemblyName>ChooseDealLocationOnAccept_IL2CPP</AssemblyName>
+	    <OutputPath>bin\Debug_IL2CPP\</OutputPath>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)' == 'Release_IL2CPP'">
+	    <DefineConstants>MELONLOADER_IL2CPP</DefineConstants>
+	    <AssemblyName>ChooseDealLocationOnAccept_IL2CPP</AssemblyName>
+	    <OutputPath>bin\Release_IL2CPP\</OutputPath>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)' == 'Debug_Mono'">
+	    <DefineConstants>MELONLOADER_MONO</DefineConstants>
+	    <AssemblyName>ChooseDealLocationOnAccept_Mono</AssemblyName>
+	    <OutputPath>bin\Debug_Mono\</OutputPath>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)' == 'Release_Mono'">
+	    <DefineConstants>MELONLOADER_MONO</DefineConstants>
+	    <AssemblyName>ChooseDealLocationOnAccept_Mono</AssemblyName>
+	    <OutputPath>bin\Release_Mono\</OutputPath>
+    </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>

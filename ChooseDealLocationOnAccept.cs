@@ -1,12 +1,19 @@
 ﻿using MelonLoader;
 using HarmonyLib;
 using UnityEngine;
+#if MELONLOADER_IL2CPP
+using ScheduleOne = Il2CppScheduleOne;
+using Il2CppScheduleOne.DevUtilities;
+using Il2CppScheduleOne.Economy;
+using Il2CppScheduleOne.Quests;
+using Il2CppScheduleOne.UI.Phone.Messages;
+#else
+using ScheduleOne = ScheduleOne;
 using ScheduleOne.Economy;
 using ScheduleOne.Quests;
-using System;
-using System.Collections.Generic;
 using ScheduleOne.UI.Phone.Messages;
 using ScheduleOne.DevUtilities;
+#endif
 
 public class ChooseDealLocationOnAccept : MelonMod
 {
@@ -29,6 +36,7 @@ public class ChooseDealLocationOnAccept : MelonMod
     private GUIStyle squareLabelStyle; // don't delete this one! error without
     private GUIStyle squareScrollStyle;
     private GUIStyle squareScrollThumbStyle;
+    private static Dictionary<string, GUIContent> buttonLabels = new Dictionary<string, GUIContent>();
 
     public static void Print(String s) => MelonLogger.Msg(s);
 
@@ -48,41 +56,7 @@ public class ChooseDealLocationOnAccept : MelonMod
     public override void OnLateInitializeMelon()
     {
         // wait till the game loads, then make the LocationGuids dict
-        ScheduleOne.Persistence.LoadManager.Instance.onLoadComplete.AddListener(MakeDeliveryLocationsDict);
-    }
-    //finds me some GameObjects so I can active/deactive them
-    private static Transform FindObjectEndingWith(string pathEnd)
-    {
-        foreach (GameObject root in UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects())
-        {
-            Transform match = FindTransformEndingWith(root.transform, pathEnd);
-            if (match != null)
-                return match;
-        }
-        return null;
-    }
-
-    private static Transform FindTransformEndingWith(Transform current, string pathEnd)
-    {
-        string fullPath = current.name;
-        Transform temp = current.parent;
-        while (temp != null)
-        {
-            fullPath = temp.name + "/" + fullPath;
-            temp = temp.parent;
-        }
-
-        if (fullPath.EndsWith(pathEnd))
-            return current;
-
-        foreach (Transform child in current)
-        {
-            Transform found = FindTransformEndingWith(child, pathEnd);
-            if (found != null)
-                return found;
-        }
-
-        return null;
+        ScheduleOne.Persistence.LoadManager.Instance.onLoadComplete.AddListener((UnityEngine.Events.UnityAction)MakeDeliveryLocationsDict);
     }
 
     [HarmonyPatch(typeof(Customer), "PlayerAcceptedContract")]
@@ -99,7 +73,7 @@ public class ChooseDealLocationOnAccept : MelonMod
             return true;
         }
     }
-    
+
 
     [HarmonyPatch(typeof(Customer), "AcceptContractClicked")]
     public class Customer_AcceptContractClicked_Patch
@@ -113,9 +87,7 @@ public class ChooseDealLocationOnAccept : MelonMod
                 return false;
             }
 
-            string basePath = "/Player_Local/CameraContainer/Camera/OverlayCamera/GameplayMenu/Phone/phone/AppsCanvas/Messages/Container/DealWindowSelector";
-
-            Transform dealWindowSelector = FindObjectEndingWith(basePath);
+            Transform dealWindowSelector = ScheduleOne.PlayerScripts.Player.Local.transform.Find("CameraContainer/Camera/OverlayCamera/GameplayMenu/Phone/phone/AppsCanvas/Messages/Container/DealWindowSelector");
             if (dealWindowSelector != null)
             {
                 dealWindowSelector.gameObject.SetActive(true);
@@ -139,8 +111,6 @@ public class ChooseDealLocationOnAccept : MelonMod
 
             return false;
         }
-
-        
     }
 
     private void DrawWindow(int windowID)
@@ -155,11 +125,13 @@ public class ChooseDealLocationOnAccept : MelonMod
         scrollUIPosition = GUILayout.BeginScrollView(scrollUIPosition, GUILayout.Height(windowUIRect.height - 60));
         foreach (KeyValuePair<string, string> pair in LocationGuids)
         {
-            if (GUILayout.Button(pair.Key, squareButtonStyle))
+            if (!buttonLabels.ContainsKey(pair.Key))
+                buttonLabels[pair.Key] = new GUIContent(pair.Key);
+
+            if (GUILayout.Button(buttonLabels[pair.Key], squareButtonStyle))
             {
                 currentSelectedDeliveryLocation = pair.Key;
                 currentSelectedGUID = pair.Value;
-                Print($"Clicked on location: {currentSelectedDeliveryLocation} with GUID {currentSelectedGUID}");
                 showUI = false;
                 selectedDeliveryLocation = true;
                 useRandomDeliveryLocation = false;
@@ -175,20 +147,20 @@ public class ChooseDealLocationOnAccept : MelonMod
 
         if (showUI)
         {
-            windowUIRect = GUI.Window(0, windowUIRect, DrawWindow, "Choose Deal Locations", squareWindowStyle);
+            windowUIRect = GUI.Window(0, windowUIRect, (GUI.WindowFunction)DrawWindow, "Choose Deal Locations", squareWindowStyle);
         }
 
-        HandleDeferredContractAcceptance();
+        if (pendingCustomer != null && selectedDeliveryLocation)
+        {
+            HandleDeferredContractAcceptance();
+        }
     }
 
     private void InitializeStyles()
     {
         Texture2D whiteTex = Texture2D.whiteTexture;
         Texture2D blackTex = Texture2D.blackTexture;
-        Texture2D buttonColorTex = new Texture2D(1, 1);
-        buttonColorTex.SetPixel(0, 0, new Color(74f / 255f, 175f / 255f, 224f / 255f));
-        buttonColorTex.wrapMode = TextureWrapMode.Repeat;
-        buttonColorTex.Apply();
+        Texture2D buttonColorTex = whiteTex;
 
         squareWindowStyle = new GUIStyle(GUI.skin.window)
         {
@@ -239,8 +211,9 @@ public class ChooseDealLocationOnAccept : MelonMod
             return;
         }
 
-        foreach (Transform child in deliveryLocations.transform)
+        for (int i = 0; i < deliveryLocations.transform.childCount; i++)
         {
+            Transform child = deliveryLocations.transform.GetChild(i);
             DeliveryLocation location = child.GetComponent<DeliveryLocation>();
             if (location != null)
             {
@@ -264,8 +237,8 @@ public class ChooseDealLocationOnAccept : MelonMod
         if (pendingCustomer != null && selectedDeliveryLocation)
         {
             // Reactivate Shade/Content
-            Transform shadeTransform = FindObjectEndingWith("/Player_Local/CameraContainer/Camera/OverlayCamera/GameplayMenu/Phone/phone/AppsCanvas/Messages/Container/DealWindowSelector/Shade");
-            Transform contentTransform = FindObjectEndingWith("/Player_Local/CameraContainer/Camera/OverlayCamera/GameplayMenu/Phone/phone/AppsCanvas/Messages/Container/DealWindowSelector/Shade/Content");
+            Transform shadeTransform = ScheduleOne.PlayerScripts.Player.Local.transform.Find("CameraContainer/Camera/OverlayCamera/GameplayMenu/Phone/phone/AppsCanvas/Messages/Container/DealWindowSelector/Shade");
+            Transform contentTransform = ScheduleOne.PlayerScripts.Player.Local.transform.Find("CameraContainer/Camera/OverlayCamera/GameplayMenu/Phone/phone/AppsCanvas/Messages/Container/DealWindowSelector/Shade/Content");
             if (shadeTransform != null && contentTransform != null)
             {
                 shadeTransform.gameObject.SetActive(true);  // Reactivate Shade
@@ -287,10 +260,10 @@ public class ChooseDealLocationOnAccept : MelonMod
             }
             else
             {
-                MelonLogger.Warning("Could not find PlayerAcceptedContract method!"); 
+                MelonLogger.Warning("Could not find PlayerAcceptedContract method!");
             }
 
-            
+
 
             // Reset state
             pendingCustomer = null;
