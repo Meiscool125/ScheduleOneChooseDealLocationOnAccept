@@ -19,6 +19,7 @@ using ScheduleOne.UI.Phone.Messages;
 using ScheduleOne.DevUtilities;
 #endif
 
+//THANK YOU JUMBLEBUMBLE FOR ALL YOUR HARD WORK!
 public class ChooseDealLocationOnAccept : MelonMod
 {
     // stores LocationName, LocationGUID
@@ -58,25 +59,41 @@ public class ChooseDealLocationOnAccept : MelonMod
         // wait till the game loads, then make the LocationGuids dict
         ScheduleOneGame.Persistence.LoadManager.Instance.onLoadComplete.AddListener((UnityEngine.Events.UnityAction)MakeDeliveryLocationsDict);
         // make textures/colors
-        buttonColorTex = new Texture2D(1, 1);
-        buttonColorTex.SetPixel(0, 0, new Color(74f / 255f, 175f / 255f, 224f / 255f));
-        buttonColorTex.wrapMode = TextureWrapMode.Repeat;
-        buttonColorTex.Apply();
+        #if MELONLOADER_IL2CPP
+                buttonColorTex = Texture2D.grayTexture;
+        #else
+                buttonColorTex = new Texture2D(1, 1);
+                buttonColorTex.SetPixel(0, 0, new Color(74f / 255f, 175f / 255f, 224f / 255f));
+                buttonColorTex.wrapMode = TextureWrapMode.Repeat;
+                buttonColorTex.Apply();
+        #endif
 
-        buttonHoverColorTex = new Texture2D(1, 1);
-        buttonHoverColorTex.SetPixel(0, 0, new Color(117f / 255f, 194f / 255f, 230f / 255f));
-        buttonHoverColorTex.wrapMode = TextureWrapMode.Repeat;
-        buttonHoverColorTex.Apply();
+        #if MELONLOADER_IL2CPP
+                buttonHoverColorTex = Texture2D.grayTexture;
+        #else
+                buttonHoverColorTex = new Texture2D(1, 1);
+                buttonHoverColorTex.SetPixel(0, 0, new Color(117f / 255f, 194f / 255f, 230f / 255f));
+                buttonHoverColorTex.wrapMode = TextureWrapMode.Repeat;
+                buttonHoverColorTex.Apply();
+        #endif
 
-        blackTex = new Texture2D(1, 1);
-        blackTex.SetPixel(0, 0, new Color(190f / 255f, 190f / 255f, 190f / 255f));
-        blackTex.wrapMode = TextureWrapMode.Repeat;
-        blackTex.Apply();
+        #if MELONLOADER_IL2CPP
+                blackTex = Texture2D.blackTexture;
+        #else
+                blackTex = new Texture2D(1, 1);
+                blackTex.SetPixel(0, 0, new Color(190f / 255f, 190f / 255f, 190f / 255f));
+                blackTex.wrapMode = TextureWrapMode.Repeat;
+                blackTex.Apply();
+        #endif
 
-        scrollBarTex = new Texture2D(1, 1);
-        scrollBarTex.SetPixel(0, 0, new Color(190f / 255f, 190f / 255f, 190f / 255f));
-        scrollBarTex.wrapMode = TextureWrapMode.Repeat;
-        scrollBarTex.Apply();
+        #if MELONLOADER_IL2CPP
+                scrollBarTex = Texture2D.grayTexture;
+        #else
+                scrollBarTex = new Texture2D(1, 1);
+                scrollBarTex.SetPixel(0, 0, new Color(190f / 255f, 190f / 255f, 190f / 255f));
+                scrollBarTex.wrapMode = TextureWrapMode.Repeat;
+                scrollBarTex.Apply();
+        #endif
     }
 
     [HarmonyPatch(typeof(Customer), "PlayerAcceptedContract")]
@@ -150,24 +167,50 @@ public class ChooseDealLocationOnAccept : MelonMod
             scrollUIPosition,
             GUIStyle.none,
             squareVerticalScrollStyle,
-            GUILayout.Height(windowUIRect.height - 80)
+            GUILayout.Height(windowUIRect.height - 90)
         );
+
+        int i = 0;
+        int total = LocationGuids.Count;
 
         foreach (KeyValuePair<string, string> pair in LocationGuids)
         {
             if (!buttonLabels.ContainsKey(pair.Key))
                 buttonLabels[pair.Key] = new GUIContent(pair.Key);
 
-            if (GUILayout.Button(buttonLabels[pair.Key], squareButtonStyle, GUILayout.Width(buttonWidth)))
+            // If this is the LAST button
+            if (i == total - 1)
             {
-                currentSelectedDeliveryLocation = pair.Key;
-                currentSelectedGUID = pair.Value;
-                showUI = false;
-                selectedDeliveryLocation = true;
-                useRandomDeliveryLocation = false;
+                // Make a temporary style clone
+                GUIStyle lastButtonStyle = new GUIStyle(squareButtonStyle);
+                lastButtonStyle.margin = new RectOffset(3, 3, 3, 1); // bottom margin 0 instead of 3
+
+                if (GUILayout.Button(buttonLabels[pair.Key], lastButtonStyle, GUILayout.Width(buttonWidth)))
+                {
+                    currentSelectedDeliveryLocation = pair.Key;
+                    currentSelectedGUID = pair.Value;
+                    showUI = false;
+                    selectedDeliveryLocation = true;
+                    useRandomDeliveryLocation = false;
+                }
             }
+            else
+            {
+                if (GUILayout.Button(buttonLabels[pair.Key], squareButtonStyle, GUILayout.Width(buttonWidth)))
+                {
+                    currentSelectedDeliveryLocation = pair.Key;
+                    currentSelectedGUID = pair.Value;
+                    showUI = false;
+                    selectedDeliveryLocation = true;
+                    useRandomDeliveryLocation = false;
+                }
+            }
+
+            i++;
         }
+
         GUILayout.EndScrollView();
+        
     }
 
     public override void OnGUI()
@@ -195,10 +238,6 @@ public class ChooseDealLocationOnAccept : MelonMod
     private void InitializeStyles()
     {
         Texture2D whiteTex = Texture2D.whiteTexture;
-        Texture2D blackTex = new Texture2D(1, 1);
-        blackTex.SetPixel(0, 0, new Color(0.2f, 0.2f, 0.2f));
-        blackTex.wrapMode = TextureWrapMode.Repeat;
-        blackTex.Apply();
 
         scrollUIPosition = Vector2.zero;
         windowUIRect = new Rect(837, 354, 245, 335);
@@ -249,7 +288,11 @@ public class ChooseDealLocationOnAccept : MelonMod
         {
             normal = new GUIStyleState
             {
+                #if MELONLOADER_IL2CPP
+                textColor = Color.blue,
+                #else
                 textColor = new Color(0.2f, 0.2f, 0.2f),
+                #endif
             },
             wordWrap = true,
             fontSize = 12,
@@ -301,7 +344,7 @@ public class ChooseDealLocationOnAccept : MelonMod
                 background = scrollBarTex,
             },
             fixedWidth = 10,
-            fixedHeight = 16,
+            //fixedHeight = 16,
         };
 
         GUI.skin.verticalScrollbarThumb = squareVerticalScrollThumbStyle;

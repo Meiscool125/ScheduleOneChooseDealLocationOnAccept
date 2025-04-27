@@ -90,7 +90,8 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>libs\mono\UnityEngine.InputLegacyModule.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.TextRenderingModule">
+    <Reference Include="UnityEngine.TextRenderingModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>libs\mono\UnityEngine.TextRenderingModule.dll</HintPath>
     </Reference>
   </ItemGroup>
@@ -111,6 +112,10 @@
     <Content Include="libs\mono\UnityEngine.dll" />
     <Content Include="libs\mono\UnityEngine.IMGUIModule.dll" />
     <Content Include="libs\mono\UnityEngine.InputLegacyModule.dll" />
+    <Content Include="libs\mono\UnityEngine.TextRenderingModule.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">

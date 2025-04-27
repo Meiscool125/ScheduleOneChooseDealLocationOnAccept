@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using MelonLoader;
 
-[assembly: MelonInfo(typeof(ChooseDealLocationOnAccept), "Choose Deal Location", "1.0.0", "meiscool125")]
+[assembly: MelonInfo(typeof(ChooseDealLocationOnAccept), "Choose Deal Location", "2.0.0", "meiscool125 and JumbleBumble")]
 [assembly: MelonGame("TVGS", "Schedule I")]
 [assembly: MelonColor(143, 45, 162, 1)]
 [assembly: MelonAuthorColor(0, 255, 252, 1)]
