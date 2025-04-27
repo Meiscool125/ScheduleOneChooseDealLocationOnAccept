@@ -5,7 +5,7 @@
 
 bin/
 obj/
-*.sln
+
 packages.config
 # User-specific files
 *.rsuser
