@@ -57,11 +57,16 @@
     </Reference>
     <Reference Include="Assembly-CSharp, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>libs\mono\Assembly-CSharp.dll</HintPath>
+      <HintPath>libs\il2\Assembly-CSharp.dll</HintPath>
     </Reference>
-    <Reference Include="FishNet.Runtime, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>libs\mono\FishNet.Runtime.dll</HintPath>
+    <Reference Include="Il2CppFishNet.Runtime">
+      <HintPath>libs\il2\Il2CppFishNet.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="Il2CppInterop.Runtime">
+      <HintPath>libs\il2\Il2CppInterop.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="Il2Cppmscorlib">
+      <HintPath>libs\il2\Il2Cppmscorlib.dll</HintPath>
     </Reference>
     <Reference Include="MelonLoader">
       <HintPath>libs\il2\MelonLoader.dll</HintPath>
@@ -76,23 +81,23 @@
     <Reference Include="System.Xml" />
     <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>libs\mono\UnityEngine.dll</HintPath>
+      <HintPath>libs\il2\UnityEngine.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>libs\mono\UnityEngine.CoreModule.dll</HintPath>
+      <HintPath>libs\il2\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.IMGUIModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>libs\mono\UnityEngine.IMGUIModule.dll</HintPath>
+      <HintPath>libs\il2\UnityEngine.IMGUIModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.InputLegacyModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>libs\mono\UnityEngine.InputLegacyModule.dll</HintPath>
+      <HintPath>libs\il2\UnityEngine.InputLegacyModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.TextRenderingModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>libs\mono\UnityEngine.TextRenderingModule.dll</HintPath>
+      <HintPath>libs\il2\UnityEngine.TextRenderingModule.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -106,16 +111,19 @@
     <Analyzer Include="libs\mono\Assembly-CSharp.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="libs\mono\Assembly-CSharp.dll" />
-    <Content Include="libs\mono\FishNet.Runtime.dll" />
-    <Content Include="libs\mono\UnityEngine.CoreModule.dll" />
-    <Content Include="libs\mono\UnityEngine.dll" />
-    <Content Include="libs\mono\UnityEngine.IMGUIModule.dll" />
-    <Content Include="libs\mono\UnityEngine.InputLegacyModule.dll" />
-    <Content Include="libs\mono\UnityEngine.TextRenderingModule.dll" />
+    <WCFMetadata Include="Connected Services\" />
   </ItemGroup>
   <ItemGroup>
-    <WCFMetadata Include="Connected Services\" />
+    <Content Include="libs\il2\Assembly-CSharp.dll" />
+    <Content Include="libs\il2\Il2CppFishNet.Runtime.dll" />
+    <Content Include="libs\il2\Il2CppInterop.Runtime.dll" />
+    <Content Include="libs\il2\Il2Cppmscorlib.dll" />
+    <Content Include="libs\il2\MelonLoader.dll" />
+    <Content Include="libs\il2\UnityEngine.CoreModule.dll" />
+    <Content Include="libs\il2\UnityEngine.dll" />
+    <Content Include="libs\il2\UnityEngine.IMGUIModule.dll" />
+    <Content Include="libs\il2\UnityEngine.InputLegacyModule.dll" />
+    <Content Include="libs\il2\UnityEngine.TextRenderingModule.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">

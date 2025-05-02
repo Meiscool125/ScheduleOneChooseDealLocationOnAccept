@@ -137,7 +137,6 @@ public class ChooseDealLocationOnAccept : MelonMod
                 if (background != null) background.gameObject.SetActive(true);
                 if (shade != null) shade.gameObject.SetActive(true);
                 if (content != null) content.gameObject.SetActive(false);
-                Print("Should've disabled!");
             }
             else
             {
@@ -364,7 +363,7 @@ public class ChooseDealLocationOnAccept : MelonMod
         }
         catch (Exception exception)
         {
-            Print("Could not get deliveryLocations: " + exception);
+            MelonLogger.Warning("Could not get deliveryLocations: " + exception);
             return;
         }
 
@@ -401,7 +400,6 @@ public class ChooseDealLocationOnAccept : MelonMod
             {
                 shadeTransform.gameObject.SetActive(true);  // Reactivate Shade
                 contentTransform.gameObject.SetActive(true);  // Reactivate Content
-                Print("Re-enabled Shade/Content GameObjects.");
             }
             else
             {
@@ -414,7 +412,6 @@ public class ChooseDealLocationOnAccept : MelonMod
             {
                 Action<EDealWindow> callback = (Action<EDealWindow>)Delegate.CreateDelegate(typeof(Action<EDealWindow>), pendingCustomer, method);
                 PlayerSingleton<MessagesApp>.Instance.DealWindowSelector.SetIsOpen(true, pendingCustomer.NPC.MSGConversation, callback);
-                Print("Executed deferred PlayerAcceptedContract logic");
             }
             else
             {
