@@ -59,41 +59,41 @@ public class ChooseDealLocationOnAccept : MelonMod
         // wait till the game loads, then make the LocationGuids dict
         ScheduleOneGame.Persistence.LoadManager.Instance.onLoadComplete.AddListener((UnityEngine.Events.UnityAction)MakeDeliveryLocationsDict);
         // make textures/colors
-        #if MELONLOADER_IL2CPP
-                buttonColorTex = Texture2D.grayTexture;
-        #else
+#if MELONLOADER_IL2CPP
+        buttonColorTex = Texture2D.grayTexture;
+#else
                 buttonColorTex = new Texture2D(1, 1);
                 buttonColorTex.SetPixel(0, 0, new Color(74f / 255f, 175f / 255f, 224f / 255f));
                 buttonColorTex.wrapMode = TextureWrapMode.Repeat;
                 buttonColorTex.Apply();
-        #endif
+#endif
 
-        #if MELONLOADER_IL2CPP
-                buttonHoverColorTex = Texture2D.grayTexture;
-        #else
+#if MELONLOADER_IL2CPP
+        buttonHoverColorTex = Texture2D.grayTexture;
+#else
                 buttonHoverColorTex = new Texture2D(1, 1);
                 buttonHoverColorTex.SetPixel(0, 0, new Color(117f / 255f, 194f / 255f, 230f / 255f));
                 buttonHoverColorTex.wrapMode = TextureWrapMode.Repeat;
                 buttonHoverColorTex.Apply();
-        #endif
+#endif
 
-        #if MELONLOADER_IL2CPP
-                blackTex = Texture2D.blackTexture;
-        #else
+#if MELONLOADER_IL2CPP
+        blackTex = Texture2D.blackTexture;
+#else
                 blackTex = new Texture2D(1, 1);
                 blackTex.SetPixel(0, 0, new Color(190f / 255f, 190f / 255f, 190f / 255f));
                 blackTex.wrapMode = TextureWrapMode.Repeat;
                 blackTex.Apply();
-        #endif
+#endif
 
-        #if MELONLOADER_IL2CPP
-                scrollBarTex = Texture2D.grayTexture;
-        #else
+#if MELONLOADER_IL2CPP
+        scrollBarTex = Texture2D.grayTexture;
+#else
                 scrollBarTex = new Texture2D(1, 1);
                 scrollBarTex.SetPixel(0, 0, new Color(190f / 255f, 190f / 255f, 190f / 255f));
                 scrollBarTex.wrapMode = TextureWrapMode.Repeat;
                 scrollBarTex.Apply();
-        #endif
+#endif
     }
 
     [HarmonyPatch(typeof(Customer), "PlayerAcceptedContract")]
@@ -209,7 +209,26 @@ public class ChooseDealLocationOnAccept : MelonMod
         }
 
         GUILayout.EndScrollView();
-        
+
+    }
+
+    private int prevScreenWidth = -1;
+    private int prevScreenHeight = -1;
+
+    private void UpdateWindowRect()
+    {
+        if (Screen.width != prevScreenWidth || Screen.height != prevScreenHeight)
+        {
+            prevScreenWidth = Screen.width;
+            prevScreenHeight = Screen.height;
+
+            windowUIRect = new Rect(
+                Screen.width * 0.5f - 122.5f,
+                Screen.height * 0.5f - 167.5f,
+                245,
+                335
+            );
+        }
     }
 
     public override void OnGUI()
@@ -219,6 +238,7 @@ public class ChooseDealLocationOnAccept : MelonMod
 
         if (showUI)
         {
+            UpdateWindowRect();
             GUILayout.BeginArea(windowUIRect, squareWindowStyle);
 
             GUILayout.Label("Choose where to meet the customer:", squareWindowStyle);
@@ -239,7 +259,15 @@ public class ChooseDealLocationOnAccept : MelonMod
         Texture2D whiteTex = Texture2D.whiteTexture;
 
         scrollUIPosition = Vector2.zero;
-        windowUIRect = new Rect(837, 354, 245, 335);
+        //windowUIRect = new Rect(837, 354, 245, 335);
+        prevScreenWidth = Screen.width;
+        prevScreenHeight = Screen.height;
+        windowUIRect = new Rect(
+                Screen.width * 0.5f - 122.5f,
+                Screen.height * 0.5f - 167.5f,
+                245,
+                335
+            );
 
         squareWindowStyle = new GUIStyle()
         {
@@ -287,11 +315,11 @@ public class ChooseDealLocationOnAccept : MelonMod
         {
             normal = new GUIStyleState
             {
-                #if MELONLOADER_IL2CPP
+#if MELONLOADER_IL2CPP
                 textColor = Color.blue,
-                #else
+#else
                 textColor = new Color(0.2f, 0.2f, 0.2f),
-                #endif
+#endif
             },
             wordWrap = true,
             fontSize = 12,
